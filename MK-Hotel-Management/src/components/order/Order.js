@@ -84,7 +84,7 @@ const Order = (props) => {
     // const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
     // const urlLocation = useLocation();
-    // const editInfo = urlLocation.state;
+    // const editInfo = urlLocation.state  ;
 
     const editid = editData ? editData.id : null;
     let navigate = useNavigate();
