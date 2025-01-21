@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from '.././../styles.module.css';
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Divider, Grid, Paper, Snackbar, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Divider, Grid, Paper, Snackbar, TextField, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { Breadcrumb, Cancel, HMinput } from "../reusableComponent/reusableMethods";
+import { Breadcrumb, Cancel, HMinput, HMinputNo, StyledTableCell, StyledTableRow } from "../reusableComponent/reusableMethods";
 import { useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
@@ -11,6 +11,9 @@ import Tab from '@mui/material/Tab';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -84,7 +87,7 @@ const Order = (props) => {
     // const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
     // const urlLocation = useLocation();
-    // const editInfo = urlLocation.state  ;
+    // const editInfo = urlLocation.state;
 
     const editid = editData ? editData.id : null;
     let navigate = useNavigate();
@@ -174,7 +177,129 @@ const Order = (props) => {
         acc[item.item_category].push(item);
         return acc;
     }, {});
+    // -------------------------item tbl -------------------
+    const [isSet, setIsSet] = useState(false);
+    const [total, setTotal] = useState(editData ? editData.basic_total : 0);
 
+    const [isUpdateArray, setIsUpdateArray] = useState(false);
+    const [supplier_po_details, setSupplier_po_details] = useState(
+        editData ? JSON.parse(editData.supplier_po_details && editData.supplier_po_details) :
+            [{
+                sr_no: 1,
+                item_name: '',
+                quantity: 0.00,
+                item_price: 0.00,
+                total: 0.00,
+                amount: 0.00,
+            }]
+    )
+    const handleChangeInput = (e, i) => {
+        const updatedDetails = [...supplier_po_details];  // Create a shallow copy of the array
+        const updatedItem = { ...updatedDetails[i] };  // Copy the specific item
+
+        updatedItem[e.target.name] = e.target.value;
+        updatedDetails[i] = updatedItem;  // Update the item in the copied array
+        setSupplier_po_details(updatedDetails);
+
+        // Calculate total
+        let tltAmt = updatedItem['total'] || 0;
+        let qty = updatedItem['quantity'] || 0;
+        let rate = updatedItem['item_price'] || 0;
+
+        if (e.target.name === 'quantity') {
+            qty = parseFloat(e.target.value);
+        }
+        if (e.target.name === 'item_price') {
+            rate = parseFloat(e.target.value);
+        }
+
+        let basicAmt = qty * rate;
+        tltAmt = basicAmt;
+
+        updatedItem['total'] = basicAmt;
+        updatedItem['amount'] = tltAmt;
+
+        updatedDetails[i] = updatedItem;  // Update the item again in the copied array
+
+        setSupplier_po_details(updatedDetails);
+
+        // Recalculate the total
+        const totalCount = updatedDetails.map(value => value.total || 0).reduce((acc, curr) => acc + curr, 0);
+        setTotal(totalCount);
+    };
+
+    const handleRemoveSPQuotation = (id) => {
+        const updatedDetails = supplier_po_details.filter(item => item.sr_no !== id); // Create a new array excluding the item to remove
+
+        // Reassign the updated Sr. No for the remaining items
+        updatedDetails.forEach((item, index) => {
+            item.sr_no = index + 1;
+        });
+
+        setSupplier_po_details(updatedDetails); // Update state with the new array
+
+        // Recalculate the total
+        const totalCount = updatedDetails.map(value => value.total || 0).reduce((acc, curr) => acc + curr, 0);
+        setTotal(totalCount);
+    };
+
+    const handleAddSPQuotationFields = (item) => {
+        // Check if the item is already in the table based on its unique id (or combination of item_name and item_price)
+        const isItemInDetails = supplier_po_details.some(detail => detail.item_name === item.item_name && detail.item_price === item.item_price);
+
+        // Prevent adding the item if it already exists
+        if (isItemInDetails) {
+            console.log('Item already exists');
+            return; // Don't add the item again
+        }
+
+        // Add the clicked item to the table
+        const updatedDetails = [
+            ...supplier_po_details, // Existing items
+            {
+                sr_no: supplier_po_details.length + 1, // New Sr. No based on existing items length
+                item_name: item.item_name,
+                item_price: item.item_price,
+                quantity: 1.00, // Default quantity
+                total: item.item_price, // Calculate total as price * quantity
+                amount: item.item_price, // Amount starts as price for the first item
+            }
+        ];
+
+        // Update the state
+        setSupplier_po_details(updatedDetails);
+
+        // Recalculate total
+        const totalCount = updatedDetails.map(value => value.total || 0).reduce((acc, curr) => acc + curr, 0);
+        setTotal(totalCount);
+    };
+    const handleChangeQuantity = (index, operation) => {
+        const updatedDetails = [...supplier_po_details]; // Create a shallow copy of the array
+    
+        // Get the current item
+        const updatedItem = { ...updatedDetails[index] };
+    
+        // Update the quantity based on the operation
+        if (operation === 'increment') {
+            updatedItem.quantity += 1;
+        } else if (operation === 'decrement' && updatedItem.quantity > 1) {
+            updatedItem.quantity -= 1; // Prevent going below 1
+        }
+    
+        // Recalculate the total based on updated quantity
+        updatedItem.total = updatedItem.quantity * updatedItem.item_price;
+        updatedItem.amount = updatedItem.total;
+    
+        // Update the item in the copied array
+        updatedDetails[index] = updatedItem;
+    
+        // Update the state with the new array
+        setSupplier_po_details(updatedDetails);
+    
+        // Recalculate the total amount for all items
+        const totalCount = updatedDetails.map(item => item.total || 0).reduce((acc, curr) => acc + curr, 0);
+        setTotal(totalCount);
+    };
     return (
         <>
             <div>
@@ -190,7 +315,7 @@ const Order = (props) => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Box>
                             <Grid container spacing={2} >
-                                <Grid item xs={8} >
+                                <Grid item xs={12} md={8} >
                                     <Box sx={{ width: '100%' }}>
                                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -267,7 +392,7 @@ const Order = (props) => {
                                                             {groupedMenuItems[category].map((item) => (
                                                                 <Grid item xs={12} sm={4} md={3} key={item.id}>
                                                                     {/* Card */}
-                                                                    <Card sx={{ maxWidth: 345 }}>
+                                                                    <Card sx={{ maxWidth: 345 }} onClick={() => handleAddSPQuotationFields(item)} >
                                                                         <CardHeader
                                                                             avatar={
                                                                                 <Avatar
@@ -318,36 +443,115 @@ const Order = (props) => {
                                         </CustomTabPanel> */}
                                     </Box>
                                 </Grid>
-                                <Grid item xs={4} >
-                                    <TableContainer component={Paper}>
-                                        <Table sx={{}} aria-label="menu table">
+                                <Grid item xs={12} md={4}>
+                                    <TableContainer style={{ maxHeight: '450px', minHeight: '448px', marginTop: '5px' }}>
+                                        <Table sx={{ minWidth: 50 }} size="small" aria-label="a dense table">
                                             <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Item Name</TableCell>
-                                                    <TableCell align="right">Qty</TableCell>
-                                                    <TableCell align="right">Price (₹)</TableCell>
-
-                                                    <TableCell align="right">Half Price (₹)</TableCell>
-
-                                                </TableRow>
+                                                <StyledTableRow>
+                                                    <StyledTableCell align="center" className={`${styles.table_head}`}></StyledTableCell>
+                                                    <StyledTableCell align="left" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }} width="15%">Sr. No</StyledTableCell>
+                                                    <StyledTableCell align="left" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }} width="35%">Item Name</StyledTableCell>
+                                                    <StyledTableCell align="center" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}width="18%">Qty</StyledTableCell>
+                                                    <StyledTableCell align="center" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}>Price</StyledTableCell>
+                                                    <StyledTableCell align="right" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}>Amount</StyledTableCell>
+                                                </StyledTableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {menuItems.map((item) => (
-                                                    <TableRow key={item.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                                        <TableCell component="th" scope="row">{item.item_name}</TableCell>
-                                                        <TableCell component="th" scope="row"><HMinput /></TableCell>
-                                                        <TableCell align="right">{item.item_price}</TableCell>
-                                                        <TableCell align="right">{item.item_in_half ? item.item_half_price : 'N/A'}</TableCell>
-                                                    </TableRow>
+                                                {supplier_po_details.map((row, index) => (
+                                                    <StyledTableRow key={row.sr_no}>
+                                                        <StyledTableCell align="left">
+                                                            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                {index === 0 ? (
+                                                                    <IconButton disabled size="small" style={{ fontSize: '12px', color: 'red' }}>
+                                                                        <CloseIcon sx={{ color: '#c0c0c0', fontSize: '18px' }} />
+                                                                    </IconButton>
+                                                                ) : (
+                                                                    <IconButton size="small" onClick={() => handleRemoveSPQuotation(row.sr_no)} style={{ fontSize: '12px', color: 'red' }}>
+                                                                        <CloseIcon sx={{ fontSize: '18px' }} />
+                                                                    </IconButton>
+                                                                )}
+                                                            </Box>
+                                                        </StyledTableCell>
+
+                                                        <StyledTableCell align="left">
+                                                            <HMinput size="small" variant="standard" InputProps={{ disableUnderline: true }} type="text" name="sr_no" value={row.sr_no || index + 1} />
+                                                        </StyledTableCell>
+
+                                                        <StyledTableCell align="left">
+                                                            <HMinput size="small" variant="standard" InputProps={{ disableUnderline: true }} type="text" name="item_name" value={row.item_name} onChange={(e) => handleChangeInput(e, index)} />
+                                                        </StyledTableCell>
+
+                                                        <StyledTableCell align="center">
+                                                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => handleChangeQuantity(index, 'decrement')}
+                                                                    sx={{ fontSize: '16px', color: '#1b52d1' }}
+                                                                >
+                                                                  -  {/* <RemoveIcon sx={{ fontSize: '16px' }} /> */}
+                                                                </IconButton>
+
+                                                                <HMinputNo
+                                                                    size="small"
+                                                                    variant="standard"
+                                                                    InputProps={{ disableUnderline: true }}
+                                                                    type="number"
+                                                                    name="quantity"
+                                                                    value={row.quantity}
+                                                                    onChange={(e) => handleChangeInput(e, index)} // Input change handler (for typing)
+                                                                    sx={{ width: '30%', textAlign: 'center' }} // Style to center the input
+                                                                />
+
+                                                                <IconButton
+                                                                    size="small"
+                                                                    onClick={() => handleChangeQuantity(index, 'increment')}
+                                                                    sx={{ fontSize: '12px', color: '#1b52d1' }}
+                                                                >
+                                                                    <AddIcon sx={{ fontSize: '12px' }} />
+                                                                </IconButton>
+                                                            </div>
+                                                            {/* <HMinputNo size="small" variant="standard" InputProps={{ disableUnderline: true }} type="number" name="quantity" value={row.quantity} onChange={(e) => handleChangeInput(e, index)} /> */}
+                                                        </StyledTableCell>
+
+                                                        <StyledTableCell align="center">
+                                                            <HMinputNo size="small" variant="standard" InputProps={{ disableUnderline: true }} type="number" name="item_price" value={row.item_price} onChange={(e) => handleChangeInput(e, index)} />
+                                                        </StyledTableCell>
+
+                                                        <StyledTableCell align="right">
+                                                            <HMinputNo size="small" variant="standard" type="number" name="total" value={parseFloat(row.total).toFixed(2)} InputProps={{ readOnly: true, disableUnderline: true }} onChange={(e) => handleChangeInput(e, index)} />
+                                                        </StyledTableCell>
+                                                    </StyledTableRow>
                                                 ))}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
+
                                     <Box sx={{ p: 2 }}>
                                         {/* Row 1: Total Amount */}
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total Amount</Typography>
-                                            <Typography variant="h6" sx={{ color: 'green' }}>₹{totalAmount}</Typography>
+                                            {/* <HMinputNo
+                                                sx={{
+                                                    paddingLeft: '16px',
+                                                    "& .MuiInputBase-root": {
+                                                        "& input": {
+                                                            textAlign: "right",
+                                                            fontSize: '12px'
+                                                        }
+                                                    }
+                                                }}
+                                                variant="standard"
+                                                required
+                                                type="number"
+                                                name="total"
+                                                size='small'
+                                                onChange={handleChange}
+                                                value={parseFloat(total).toFixed(2)}
+                                                InputProps={{
+                                                    disableUnderline: true,
+                                                }}
+                                            /> */}
+                                            <Typography variant="h6" sx={{ color: 'green' }}>₹{parseFloat(total).toFixed(2)}</Typography>
                                         </Box>
 
                                         {/* Row 2: Buttons */}

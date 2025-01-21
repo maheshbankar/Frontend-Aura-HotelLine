@@ -1,0 +1,19 @@
+{
+    "welcome": "Welcome",
+    "login": "Login",
+    "logout": "Logout",
+    "select_language": "Select Language",
+    "menu": {
+        "item_categories": "Item Categories",
+        "item_types": "Item Types",
+        "items": "Items",
+        "employees": "Employees",
+        "employee_types": "Employee Types",
+        "seating_types": "Seating Types",
+        "tables": "Tables"
+    },
+    "masters": "Masters",
+    "dashboard": "Dashboard",
+    "order": "Order",
+    "back": "Back"
+}

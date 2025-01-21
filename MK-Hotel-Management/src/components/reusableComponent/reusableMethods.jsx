@@ -21,6 +21,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import AddIcon from '@mui/icons-material/Add';
+import { useTranslation } from 'react-i18next';
+
 
 // TL TextField 
 export const HMinput = styled(TextField)(() => ({
@@ -57,6 +59,7 @@ export const HMinputNo = styled(TextField)(() => ({
 }));
 // Search Input field
 export const SearchInput = ({ value, onChange }) => {
+    const { t } = useTranslation();
     return (
         <HMinput
             fullWidth
@@ -87,6 +90,7 @@ export const SearchInput = ({ value, onChange }) => {
 
 // Back & Cancel Button 
 export const BackBtn = () => {
+    const { t } = useTranslation();
     let navigate = useNavigate();
     const handleBack = () => {
         navigate(-1);
@@ -101,6 +105,7 @@ export const BackBtn = () => {
 };
 
 export const Cancel = () => {
+    const { t } = useTranslation();
     let navigate = useNavigate();
     const handleBack = () => {
         navigate(-1);
@@ -126,6 +131,7 @@ export const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export const BootstrapDialogTitle = (props) => {
     const { children, onClose, onClick, ...other } = props;
+    const { t } = useTranslation();
     return (
         <DialogTitle sx={{ m: 0, p: 0.7, backgroundColor: '#00527c', color: '#ffff', float: 'left', fontSize: '15px', textTransform: 'uppercase', height: '36px' }} {...other} >
             {children}
@@ -154,6 +160,7 @@ BootstrapDialogTitle.propTypes = {
 
 // Breadcrumb
 export const Breadcrumb = ({ routeSegments }) => {
+    const { t } = useTranslation();
     return (
         <div position="static" className={`${styles.bredcrum}`}>
             <Box className={`${styles.bredcrum_in}`}>
@@ -161,8 +168,8 @@ export const Breadcrumb = ({ routeSegments }) => {
                     separator={<NavigateNextIcon fontSize="smaller" />}
                     sx={{ fontSize: '12px' }}
                 >
-                    <NavLink to="/admin/dashboard" style={{ textDecoration: 'none' }}>
-                        <span style={{ color: '#8c8c8c', fontWeight: 'bold' }}> Dashboard</span>
+                    <NavLink to="/dashboard" style={{ textDecoration: 'none' }}>
+                        <span style={{ color: '#8c8c8c', fontWeight: 'bold' }}> {t('dashboard')}</span>
                     </NavLink>
                     {routeSegments
                         ? routeSegments.map((route, index) => {

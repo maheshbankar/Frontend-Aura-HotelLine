@@ -20,9 +20,10 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import { SearchOutlined } from "@mui/icons-material";
 import ItemCategoryAdd from "./ItemCategoryAdd";
+import { useTranslation } from "react-i18next";
 
 const ItemCategoryList = () => {
-
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const [successMessage, setSuccessMessage] = useState(null);
 
@@ -30,7 +31,7 @@ const ItemCategoryList = () => {
     const login_details = sessionStorage.getItem('loginUser');
     const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
-    
+
     const [openPopup, setOpenPopup] = React.useState(false);
     const [info, setInfo] = useState({});
     const [openOption, setOpenOption] = useState('');
@@ -71,46 +72,46 @@ const ItemCategoryList = () => {
     const [deleteInfo, setDeleteInfo] = useState();
     const rows = [
         {
-          id: 1,
-          item_category: "Veg"
+            id: 1,
+            item_category: "Veg"
         },
         {
-          id: 2,
-          item_category: "Nonveg"
+            id: 2,
+            item_category: "Nonveg"
         },
         {
-          id: 3,
-          item_category: "Coldrinks"
+            id: 3,
+            item_category: "Coldrinks"
         },
         {
-          id: 4,
-          item_category: "Hots"
+            id: 4,
+            item_category: "Hots"
         },
         {
-          id: 5,
-          item_category: "Snacks"
+            id: 5,
+            item_category: "Snacks"
         },
         {
-          id: 6,
-          item_category: "Desserts"
+            id: 6,
+            item_category: "Desserts"
         },
         {
-          id: 7,
-          item_category: "Juices"
+            id: 7,
+            item_category: "Juices"
         },
         {
-          id: 8,
-          item_category: "Fast Food"
+            id: 8,
+            item_category: "Fast Food"
         },
         {
-          id: 9,
-          item_category: "Salads"
+            id: 9,
+            item_category: "Salads"
         },
         {
-          id: 10,
-          item_category: "Sweets"
+            id: 10,
+            item_category: "Sweets"
         },
-      ];
+    ];
     // const rows = useSelector(state => state.bank.bank)
     // const fetchData = () => {
     //     dispatch(getBankList({ companyId: userInfo.companyId }))
@@ -146,7 +147,7 @@ const ItemCategoryList = () => {
                 }
             }
         }
-    }, [shouldShowMsg, responseMessage, 
+    }, [shouldShowMsg, responseMessage,
         // fetchData
     ]);
 
@@ -154,7 +155,7 @@ const ItemCategoryList = () => {
         fileInputRef.current.click();
     };
 
-   
+
 
     const deleteRecord = (id) => {
         // dispatch(editDeleteBank({ id: deleteInfo.id, modifiedBy: userInfo.userId, modifiedAt: dateConversionOnEntryPage(new Date()), changedUpdatedValue: 'delete' }))
@@ -220,15 +221,15 @@ const ItemCategoryList = () => {
 
     return (
         <>
-           
+
 
             <Paper className={`${styles.list_container}`}>
-            <Breadcrumb
-                routeSegments={[
-                    { name: 'Masters', path: '/masters/' },
-                    { name: 'Item Category' },
-                ]}
-            />
+                <Breadcrumb
+                    routeSegments={[
+                        { name:  t('masters') , path: '/masters/' },
+                        { name: 'Item Category' },
+                    ]}
+                />
                 <Box sx={{ display: 'flex' }}>
                     <Grid container spacing={0.2} sx={{ pt: 0.5, pb: 0.5 }}>
                         <Grid item md={7} xs={12}>
@@ -283,9 +284,9 @@ const ItemCategoryList = () => {
                                 }}
                             />
                             {/* <NavLink to={{ pathname: `/masters/add-bank-masters` }} > */}
-                                <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
-                                    <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
-                                </Button>
+                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
+                                <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
+                            </Button>
                             {/* </NavLink> */}
                         </Grid>
                         <Grid item md={12} >
@@ -303,7 +304,7 @@ const ItemCategoryList = () => {
                     <Table size="small" stickyHeader>
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell   align="center" className={`${styles.table_head}`}>Action</StyledTableCell>
+                                <StyledTableCell align="center" className={`${styles.table_head}`}>Action</StyledTableCell>
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_category')}>Item Category <span className={`${styles.sort_icon}`}> {sortBy === 'item_category' ? '▲' : '▼'} </span></StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
@@ -341,13 +342,13 @@ const ItemCategoryList = () => {
                                                         >
                                                             <Container className={`${styles.tbl_action}`}>
                                                                 <>
-                                                                   
-                                                                        <Button className={`${styles.list_tbl_action_btn}`} onClick={() => {handleClickOpenPopup(row);popupState.close()}}>
-                                                                            <EditIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />
-                                                                            <span style={{ marginRight: '13px' }}> Edit Record</span> </Button> 
+
+                                                                    <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleClickOpenPopup(row); popupState.close() }}>
+                                                                        <EditIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />
+                                                                        <span style={{ marginRight: '13px' }}> Edit Record</span> </Button>
                                                                     <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleDelete(row); popupState.close() }}>
                                                                         {/* <Icon icon="ic:baseline-delete-forever" color="#c70000" width="20" height="20" />  */}
-                                                                       <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }}/>  Delete Record</Button>
+                                                                        <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />  Delete Record</Button>
                                                                 </>
                                                             </Container>
                                                         </Popover>
@@ -356,7 +357,7 @@ const ItemCategoryList = () => {
                                             </PopupState>
                                         </StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_category}</StyledTableCell>
-                                       
+
                                     </StyledTableRow>
                                 ))}
                         </TableBody>
@@ -410,23 +411,23 @@ const ItemCategoryList = () => {
                     <Button onClick={() => deleteRecord(deleteInfo.id)} className={`${styles.dilog_delete_yes_btn}`} variant='outlined'>
                         Yes
                     </Button>
-                </DialogActions> 
+                </DialogActions>
             </Dialog>
             <BootstrapDialog
                 PaperProps={{
                     sx: {
-                      width: {
-                        xs: '90%',  // For extra-small screens (mobile)
-                        sm: '80%',  // For small screens (tablets)
-                        md: '50%',  // For medium screens (laptops)
-                        lg: '40%',  // For large screens (desktops)
-                      },
-                      maxWidth: '90%',
-                      maxHeight: 600,
-                      minWidth: '30%',
-                      minHeight: 160,
+                        width: {
+                            xs: '90%',  // For extra-small screens (mobile)
+                            sm: '80%',  // For small screens (tablets)
+                            md: '50%',  // For medium screens (laptops)
+                            lg: '40%',  // For large screens (desktops)
+                        },
+                        maxWidth: '90%',
+                        maxHeight: 600,
+                        minWidth: '30%',
+                        minHeight: 160,
                     },
-                  }}
+                }}
                 onClose={handleClose}
                 open={openPopup}
             >
@@ -435,7 +436,7 @@ const ItemCategoryList = () => {
                     {openOption === 'BankUpdate' && 'Update Category'}
                 </BootstrapDialogTitle>
                 <DialogContent dividers >
-                    <ItemCategoryAdd handleCloseDialog={handleClose} details={info} 
+                    <ItemCategoryAdd handleCloseDialog={handleClose} details={info}
                     // onAPISubmt={fetchData} 
                     />
                 </DialogContent>

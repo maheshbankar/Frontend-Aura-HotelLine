@@ -25,11 +25,16 @@ import EmployeeMasterList from '../masters/employeeRegistration/EmployeeMasterLi
 import Switch from '@mui/material/Switch';  // For dark mode toggle
 import Collapse from '@mui/material/Collapse'; // Import Collapse for the collapsible menu
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Icon for expanding
+import LanguageIcon from '@mui/icons-material/Language';
 import ItemTypeList from '../masters/itemType/ItemTypeList';
 import EmployeeTypeList from '../masters/employeeType/EmployeeTypeList';
 import SatingTypeList from '../masters/seattingArangement/seatingType/SatingTypeList';
 import TableList from '../masters/seattingArangement/tables/TableList';
 import Order from '../order/Order';
+import MastersHome from '../masters/MastersHome';
+import { Menu, MenuItem } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import '../../i18n';
 // import EmployeeTypeList from '../masters/employeeType/EmployeeTypeList';
 
 const drawerWidth = 240;
@@ -47,7 +52,24 @@ function AuranavBar(props) {
   const handleMastersToggle = () => {
     setMastersOpen(!mastersOpen); // Toggle the collapse state for Masters menu
   };
+// -----------------------------------
 
+const { t, i18n } = useTranslation();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleLanguageMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLanguageMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang) => {
+    i18n.changeLanguage(lang); // Change language using i18next
+    setAnchorEl(null); // Close the menu
+  };
   const drawer = (
     <div>
       <Toolbar />
@@ -59,7 +81,7 @@ function AuranavBar(props) {
               <InboxIcon />
             </ListItemIcon>
             <NavLink to="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <ListItemText primary="Dashboard" />
+              <ListItemText primary={t('dashboard')} />
             </NavLink>
           </ListItemButton>
         </ListItem>
@@ -70,7 +92,7 @@ function AuranavBar(props) {
             <ListItemIcon>
               <MailIcon />
             </ListItemIcon>
-            <ListItemText primary="Masters" />
+            <ListItemText primary={t('masters')} />
             <IconButton size="small">
               <ExpandMoreIcon />
             </IconButton>
@@ -85,7 +107,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/item-category" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Item Categories" />
+                  <ListItemText primary= {t('menu.item_categories')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -96,7 +118,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/item-type" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Item Types" />
+                  <ListItemText primary={t('menu.item_types')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -107,7 +129,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/items" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Items" />
+                  <ListItemText primary={t('menu.items')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -118,7 +140,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/employee" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Employees" />
+                  <ListItemText primary={t('menu.employees')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -129,7 +151,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/employee-type" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Employee Types" />
+                  <ListItemText primary={t('menu.employee_types')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -140,7 +162,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/seating-type" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Seating Types" />
+                  <ListItemText primary={t('menu.seating_types')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -151,7 +173,7 @@ function AuranavBar(props) {
                   <MailIcon />
                 </ListItemIcon>
                 <NavLink to="/table" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <ListItemText primary="Tables" />
+                  <ListItemText primary={t('menu.tables')} />
                 </NavLink>
               </ListItemButton>
             </ListItem>
@@ -207,6 +229,21 @@ function AuranavBar(props) {
             color="default"
             aria-label="Toggle Dark Mode"
           />
+            <IconButton onClick={handleLanguageMenuOpen} color="inherit">
+            <LanguageIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleLanguageMenuClose}
+            MenuListProps={{
+              'aria-labelledby': 'language-menu-button',
+            }}
+          >
+            <MenuItem onClick={() => handleLanguageChange('en')}>English</MenuItem>
+            <MenuItem onClick={() => handleLanguageChange('mr')}>मराठी</MenuItem>
+            <MenuItem onClick={() => handleLanguageChange('hi')}>हिन्दी</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Box
@@ -269,6 +306,7 @@ function AuranavBar(props) {
           <Route path="/seating-type" element={<SatingTypeList />} />
           <Route path="/table" element={<TableList />} />
           <Route path="/order" element={<Order />} />
+          <Route path="/masters" element={<MastersHome />} />
         </Routes>
       </Box>
     </Box>

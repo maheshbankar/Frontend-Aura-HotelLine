@@ -1,0 +1,19 @@
+{
+    "welcome": "स्वागत है",
+    "login": "लॉगिन",
+    "logout": "लॉगआउट",
+    "select_language": "भाषा चुनें",
+    "menu": {
+        "item_categories": "आइटम श्रेणियां",
+        "item_types": "आइटम प्रकार",
+        "items": "आइटम",
+        "employees": "कर्मचारी",
+        "employee_types": "कर्मचारी प्रकार",
+        "seating_types": "सीट प्रकार",
+        "tables": "टेबल्स"
+    },
+    "masters": "मास्टर्स",
+    "dashboard": "डॅशबोर्ड",
+    "order": "ऑर्डर",
+    "back": "मागे जा"
+}
