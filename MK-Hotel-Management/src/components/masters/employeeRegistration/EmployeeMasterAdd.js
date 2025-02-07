@@ -1,25 +1,42 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from '.././../../styles.module.css';
-import { Box, Button, Card, Grid, Paper, Snackbar, Typography } from "@mui/material";
+import { Box, Button, Card, Grid, MenuItem, Paper, Snackbar, styled, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { Breadcrumb, Cancel, HMinput } from "../../reusableComponent/reusableMethods";
+import { Breadcrumb, Cancel, HMAutocomplete, HMinput } from "../../reusableComponent/reusableMethods";
 import { useNavigate } from "react-router-dom";
 import SaveIcon from '@mui/icons-material/Save';
 
-
-const EmployeeMasterAdd = (props) =>{
-
+const useStyles = styled({
+    option: {
+        fontSize: 12,
+    },
+    noOptionsLabel: {
+        fontSize: '12px', // Set the desired font size
+    },
+});
+const EmployeeMasterAdd = (props) => {
+    const classes = useStyles();
     const dispatch = useDispatch()
     const { handleSubmit } = useForm();
     const editData = props.details;
-    console.log(editData,'dfd')
+    console.log(editData, 'dfd')
     // const login_details = sessionStorage.getItem('loginUser');
     // const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
     // const urlLocation = useLocation();
     // const editInfo = urlLocation.state;
-   
+    const [empTypeList, setSeatingList] = useState([
+        { id: 1, employee_type: 'Single' },
+        { id: 2, employee_type: 'Double' },
+        { id: 3, employee_type: 'Recliner' },
+        { id: 4, employee_type: 'Single' },
+        { id: 5, employee_type: 'Double' }
+    ]);
+    const [employee_type, setEmployee_type] = useState(editData ? editData.seating_type : null);
+    const handleChangeAddress = (event, newValue) => {
+        setEmployee_type(newValue ? newValue : null);
+    }
     const editid = editData ? editData.id : null;
     let navigate = useNavigate();
     const [successMessage, setSuccessMessage] = useState(null);
@@ -32,7 +49,7 @@ const EmployeeMasterAdd = (props) =>{
         employee_address: editData ? editData.employee_address : '',
         employee_contact_no: editData ? editData.employee_contact_no : '',
         employee_id_card: editData ? editData.employee_id_card : '',
-        status: editData ? editData.status : 'Active' ,
+        status: editData ? editData.status : 'Active',
         employee_type: editData ? editData.employee_type : '',
     });
 
@@ -126,44 +143,38 @@ const EmployeeMasterAdd = (props) =>{
         }
     }
 
-    const action = (
-        <React.Fragment>
-            <Button size="small" id="btnYes" onClick={handleOpenSnack}>
-                Yes
-            </Button>
-            <Button size="small" id="btnNo" onClick={handleCloseSnak}>
-                No
-            </Button>
-        </React.Fragment>
-    );
 
-
-    return(
+    return (
         <>
-        <div>
-          
-            <Paper className={`${styles.list_container}`}>
+            <div>
 
-                {/* <Box sx={{ m: 4 }} > </Box> */}
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Box>
-                        <Grid container spacing={2} style={{ minHeight: '250px', paddingLeft: '50px' }}>
-                           
-                            <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                                <Card className={`${styles.m_card}`}>
+                <Paper className={`${styles.add_container}`}>
+
+                    {/* <Box sx={{ m: 4 }} > </Box> */}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Box>
+                            <Grid container spacing={2} style={{ minHeight: '250px', }}>
+                                <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                                    {/* <Card className={`${styles.m_card}`}> */}
                                     <Grid container spacing={1} sx={{ mt: 0 }}>
                                         <Grid item xs={12} className={`${styles.grid_lable}`}>
                                             <Typography className={`${styles.erp_lable}`}>Employee type</Typography>
                                         </Grid>
                                         <Grid item xs={12} className={`${styles.grid_input}`}>
-                                            <HMinput
-                                                required
-                                                size='small'
-                                                fullWidth
-                                                type="text"
-                                                onChange={handleChange}
-                                                name="employee_type"
-                                                value={(data.employee_type)}
+                                            <HMAutocomplete
+                                                classes={{ option: classes.option }}
+                                                PaperComponent={({ children }) => (
+                                                    <Paper style={{ fontSize: '12px' }}>{children}</Paper>
+                                                )}
+                                                noOptionsText={<span style={{ fontSize: '12px' }}>No options</span>}
+                                                options={empTypeList}
+                                                value={employee_type}
+                                                onChange={handleChangeAddress}
+                                                getOptionLabel={(option) => option.employee_type}
+                                                getOptionSelected={(option, value) => option.id === value.id}
+                                                renderInput={(params) => (
+                                                    <HMinput fullWidth placeholder="Select Employee type" {...params} required />
+                                                )}
                                             />
                                         </Grid>
                                         <Grid item xs={12} className={`${styles.grid_lable}`}>
@@ -227,14 +238,17 @@ const EmployeeMasterAdd = (props) =>{
                                         </Grid>
                                         <Grid item xs={12} className={`${styles.grid_input}`}>
                                             <HMinput
-                                                required
+                                                select
                                                 size='small'
                                                 fullWidth
                                                 type="text"
                                                 onChange={handleChange}
                                                 name="status"
                                                 value={(data.status)}
-                                            />
+                                            >
+                                                <MenuItem value="Active" className={`${styles.erp_lable}`}>Active</MenuItem>
+                                                <MenuItem value="Inactive" className={`${styles.erp_lable}`}>Inactive</MenuItem>
+                                            </HMinput>
                                         </Grid>
                                         <Grid item xs={12} className={`${styles.grid_input}`}>
                                             <Box sx={{ marginTop: '12px', float: 'right' }}>
@@ -245,13 +259,13 @@ const EmployeeMasterAdd = (props) =>{
                                             </Box>
                                         </Grid>
                                     </Grid>
-                                </Card>
+                                    {/* </Card> */}
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </form>
-            </Paper>
-            {/* <Snackbar
+                        </Box>
+                    </form>
+                </Paper>
+                {/* <Snackbar
                 open={openSnak}
                 autoHideDuration={4000}
                 onClose={handleCloseSnak}
@@ -267,8 +281,8 @@ const EmployeeMasterAdd = (props) =>{
                     message={successMessage}
                 />
             } */}
-        </div>
-    </>
+            </div>
+        </>
     )
 }
-    export default EmployeeMasterAdd;
+export default EmployeeMasterAdd;

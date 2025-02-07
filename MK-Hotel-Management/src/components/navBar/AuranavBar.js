@@ -35,6 +35,7 @@ import MastersHome from '../masters/MastersHome';
 import { Menu, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';
+import OrderPripration from '../order/OrderPripration';
 // import EmployeeTypeList from '../masters/employeeType/EmployeeTypeList';
 
 const drawerWidth = 240;
@@ -203,8 +204,8 @@ const { t, i18n } = useTranslation();
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px}` },
+          // width: { sm: `calc(100% - ${drawerWidth}px)` },
+          // ml: { sm: `${drawerWidth}px}` },
           backgroundColor: isDarkMode ? '#333' : '#1976d2',
           color: isDarkMode ? '#fff' : '#000',
         }}
@@ -220,7 +221,7 @@ const { t, i18n } = useTranslation();
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            MK - Hotel Management
+          Hotel-Junction
           </Typography>
           <Switch
             checked={isDarkMode}
@@ -248,7 +249,7 @@ const { t, i18n } = useTranslation();
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        // sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
         aria-label="mailbox folders"
       >
         <Drawer
@@ -272,7 +273,7 @@ const { t, i18n } = useTranslation();
           {drawer}
         </Drawer>
 
-        <Drawer
+        {/* <Drawer
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
@@ -286,7 +287,7 @@ const { t, i18n } = useTranslation();
           open
         >
           {drawer}
-        </Drawer>
+        </Drawer> */}
       </Box>
       <Box
         component="main"
@@ -305,6 +306,7 @@ const { t, i18n } = useTranslation();
           <Route path="/employee-type" element={<EmployeeTypeList />} />
           <Route path="/seating-type" element={<SatingTypeList />} />
           <Route path="/table" element={<TableList />} />
+          <Route path="/table-selection" element={<OrderPripration />} />
           <Route path="/order" element={<Order />} />
           <Route path="/masters" element={<MastersHome />} />
         </Routes>

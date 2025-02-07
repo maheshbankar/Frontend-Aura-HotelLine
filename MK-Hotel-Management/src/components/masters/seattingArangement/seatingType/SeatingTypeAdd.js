@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from '.././../../../styles.module.css';
 import { Box, Button, Card, Grid, Paper, Snackbar, Typography } from "@mui/material";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import SaveIcon from '@mui/icons-material/Save';
 
 
-const SeatingTypeAdd = (props) =>{
+const SeatingTypeAdd = (props) => {
 
     const dispatch = useDispatch()
     const { handleSubmit } = useForm();
@@ -18,7 +18,7 @@ const SeatingTypeAdd = (props) =>{
     // const userInfo = userD.userInfo;
     // const urlLocation = useLocation();
     // const editInfo = urlLocation.state;
-   
+
     const editid = editData ? editData.id : null;
     let navigate = useNavigate();
     const [successMessage, setSuccessMessage] = useState(null);
@@ -132,19 +132,19 @@ const SeatingTypeAdd = (props) =>{
     );
 
 
-    return(
+    return (
         <>
-        <div>
-          
-            <Paper className={`${styles.list_container}`}>
+            <div>
 
-                {/* <Box sx={{ m: 4 }} > </Box> */}
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Box>
-                        <Grid container spacing={2} style={{ minHeight: '250px', paddingLeft: '50px' }}>
-                           
-                            <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                                <Card className={`${styles.m_card}`}>
+                <Paper className={`${styles.add_container}`}>
+
+                    {/* <Box sx={{ m: 4 }} > </Box> */}
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Box>
+                            <Grid container spacing={2} style={{ minHeight: '200px', }}>
+
+                                <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+
                                     <Grid container spacing={1} sx={{ mt: 0 }}>
                                         <Grid item xs={12} className={`${styles.grid_lable}`}>
                                             <Typography className={`${styles.erp_lable}`}>Seating Type</Typography>
@@ -160,7 +160,7 @@ const SeatingTypeAdd = (props) =>{
                                                 value={(data.seating_type)}
                                             />
                                         </Grid>
-                                        
+
                                         <Grid item xs={12} className={`${styles.grid_input}`}>
                                             <Box sx={{ marginTop: '12px', float: 'right' }}>
                                                 <Button color="primary" id={`${styles.btn_save}`} variant="contained" type="submit">
@@ -170,13 +170,12 @@ const SeatingTypeAdd = (props) =>{
                                             </Box>
                                         </Grid>
                                     </Grid>
-                                </Card>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </form>
-            </Paper>
-            {/* <Snackbar
+                        </Box>
+                    </form>
+                </Paper>
+                {/* <Snackbar
                 open={openSnak}
                 autoHideDuration={4000}
                 onClose={handleCloseSnak}
@@ -192,8 +191,8 @@ const SeatingTypeAdd = (props) =>{
                     message={successMessage}
                 />
             } */}
-        </div>
-    </>
+            </div>
+        </>
     )
 }
-    export default SeatingTypeAdd;
+export default SeatingTypeAdd;

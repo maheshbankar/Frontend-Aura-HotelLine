@@ -9,7 +9,7 @@ import {
     TableBody
 } from '@mui/material';
 import styles from '.././../../styles.module.css';
-import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
+import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, DeleteDialog, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -40,6 +40,12 @@ const ItemList = () => {
         setInfo(info);
         setOpenPopup(true);
         setOpenOption(info.id ? 'BankUpdate' : 'BankAdd')
+
+    };
+    const handleClickOpenPopupAdd = () => {
+        setInfo(undefined);
+        setOpenPopup(true);
+        setOpenOption('BankAdd')
 
     };
     const tableRef = useRef(null);
@@ -120,10 +126,6 @@ const ItemList = () => {
         // fetchData
     ]);
 
-    const handleUpload = () => {
-        fileInputRef.current.click();
-    };
-
 
 
     const deleteRecord = (id) => {
@@ -150,7 +152,7 @@ const ItemList = () => {
             return searchParam.some((newItem) => {
                 return (
                     item[newItem] && item[newItem]
-                        .toString()
+                        // .toString()
                         .toLowerCase()
                         .indexOf(q.toLowerCase()) > -1
                 );
@@ -210,21 +212,8 @@ const ItemList = () => {
                                     data={rows}
                                     fields={fields}
                                     labels={labels}
-                                    filename="Bank List"
+                                    filename="Item List"
                                 />
-                            </Box>
-                            <Box className={`${styles.excel_box}`}>
-                                {/* <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    name="file"
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileChange}
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                />
-                                <Tooltip title="Upload Excel File">
-                                    <span onClick={handleUpload} htmlFor="file-upload"> <img src={upload_excel} style={{ height: "20px", width: "20" }} /> </span>
-                                </Tooltip> */}
                             </Box>
                             <TextField
                                 fullWidth
@@ -252,20 +241,9 @@ const ItemList = () => {
                                     )
                                 }}
                             />
-                            {/* <NavLink to={{ pathname: `/masters/add-bank-masters` }} > */}
-                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
+                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopupAdd}>
                                 <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
                             </Button>
-                            {/* </NavLink> */}
-                        </Grid>
-                        <Grid item md={12} >
-                            {/* <a href={`${fileDownloadURL}SampleFileBank.csv`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                            >
-                                <Typography className={`${styles.erp_lable}`} style={{ textDecoration: 'underline', display: 'flex', float: 'right' }}> Download Sample File </Typography>
-                            </a> */}
                         </Grid>
                     </Grid>
                 </Box>
@@ -278,8 +256,6 @@ const ItemList = () => {
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_type')}>Item Type <span className={`${styles.sort_icon}`}> {sortBy === 'item_type' ? '▲' : '▼'} </span></StyledTableCell>
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_name')}>Item Name <span className={`${styles.sort_icon}`}> {sortBy === 'item_name' ? '▲' : '▼'} </span></StyledTableCell>
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_price')}>Item Price <span className={`${styles.sort_icon}`}> {sortBy === 'item_price' ? '▲' : '▼'} </span></StyledTableCell>
-                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_in_half')}>Item in Half <span className={`${styles.sort_icon}`}> {sortBy === 'item_in_half' ? '▲' : '▼'} </span></StyledTableCell>
-                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_half_price')}>Item Half Price <span className={`${styles.sort_icon}`}> {sortBy === 'item_half_price' ? '▲' : '▼'} </span></StyledTableCell>
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_image')}>Item Image <span className={`${styles.sort_icon}`}> {sortBy === 'item_image' ? '▲' : '▼'} </span></StyledTableCell>
                                 <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('status')}>Status <span className={`${styles.sort_icon}`}> {sortBy === 'status' ? '▲' : '▼'} </span></StyledTableCell>
                             </StyledTableRow>
@@ -332,8 +308,6 @@ const ItemList = () => {
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_category}</StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_type}</StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_name}</StyledTableCell>
-                                        <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_price}</StyledTableCell>
-                                        <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_in_half ? 'Yes' : 'No'}</StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_half_price ? `$${row.item_half_price}` : 'N/A'}</StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}><img src={row.item_image} alt={row.item_name} style={{ width: '50px', height: '50px' }} /></StyledTableCell>
                                         <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.status}</StyledTableCell>
@@ -359,39 +333,14 @@ const ItemList = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <Dialog open={isDelete}
-                PaperProps={{
-                    sx: {
-                        minWidth: "35%",
-                        minHeight: "22%",
-                        borderRadius: '8px'
-                    }
-                }}>
-                <DialogTitle className={`${styles.dilog_delete_title}`}>
-                    Confirm Delete The Record?
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{
-                            right: 0,
-                            top: 0,
-                            float: 'right'
-                        }} >
-                        <CloseIcon style={{ height: '18px', color: '#000000' }} />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent className={`${styles.dilog_delete_content}`}>
-                    The BillCube will remove this record # {deleteInfo && deleteInfo.item_category}
-                </DialogContent>
-                <DialogActions sx={{ padding: '10px', }}>
-                    <Button onClick={handleClose} className={`${styles.dilog_delete_no_btn}`} variant='outlined'>
-                        No
-                    </Button>
-                    <Button onClick={() => deleteRecord(deleteInfo.id)} className={`${styles.dilog_delete_yes_btn}`} variant='outlined'>
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteDialog
+                open={isDelete}
+                handleClose={handleClose}
+                deleteInfo={deleteInfo}
+                deleteRecord={deleteRecord}
+                deleteID={deleteInfo?.id || null}
+                displayName={deleteInfo?.item_name || ''}
+            />
             <BootstrapDialog
                 PaperProps={{
                     sx: {
@@ -420,14 +369,6 @@ const ItemList = () => {
                     />
                 </DialogContent>
             </BootstrapDialog>
-
-            {/* {deleteMessage &&
-                <DeleteSnackbar
-                    open={deleteMessage ? true : false}
-                    message={deleteMessage}
-                />
-            } */}
-
             {/* {successMessage &&
                 <Snackbar
                     anchorOrigin={{ vertical: "top", horizontal: "right" }}

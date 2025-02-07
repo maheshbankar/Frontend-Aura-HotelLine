@@ -133,7 +133,7 @@ export const BootstrapDialogTitle = (props) => {
     const { children, onClose, onClick, ...other } = props;
     const { t } = useTranslation();
     return (
-        <DialogTitle sx={{ m: 0, p: 0.7, backgroundColor: '#00527c', color: '#ffff', float: 'left', fontSize: '15px', textTransform: 'uppercase', height: '36px' }} {...other} >
+        <DialogTitle sx={{ m: 0, p: 0.7,paddingLeft:'20px', backgroundColor: '#00527c', color: '#ffff', float: 'left', fontSize: '15px', textTransform: 'uppercase', height: '36px' }} {...other} >
             {children}
             {onClose ? (
                 <IconButton
@@ -344,7 +344,7 @@ export const DateConversion = (date) => {
 };
 
 export const ExcelDownload = ({ data, fields, labels, filename }) => {
-
+    const { t } = useTranslation();
     const formatDate = (dateString) => {
         const dateObj = new Date(dateString);
         const year = dateObj.getFullYear();
@@ -381,7 +381,7 @@ export const ExcelDownload = ({ data, fields, labels, filename }) => {
     };
 
     return (
-        <Tooltip title="Download Excel File" >
+        <Tooltip title={t('download_excel')} >
             <SimCardDownloadTwoToneIcon onClick={downloadExcel} />
             {/* <span onClick={downloadExcel}> <img src={download_excel} style={{ height: "20px", width: "20" }} />  </span> */}
             {/* <Icon icon="vscode-icons:file-type-excel2" onClick={downloadExcel} width="16" height="16" /> */}
@@ -411,7 +411,12 @@ export function HandleSort(property, sortBy, setSortBy, rows) {
         if (typeof a[property] === 'number' && typeof b[property] === 'number') {
             return isAsc ? a[property] - b[property] : b[property] - a[property];
         } else {
-            return isAsc ? a[property].localeCompare(b[property]) : b[property].localeCompare(a[property]);
+            // Ensure both values are strings before using localeCompare
+            const valueA = a[property] ? String(a[property]) : '';
+            const valueB = b[property] ? String(b[property]) : '';
+            return isAsc 
+                ? valueA.localeCompare(valueB) 
+                : valueB.localeCompare(valueA);
         }
     });
 }
@@ -491,13 +496,13 @@ export const DeleteDialog = ({ open, handleClose, deleteInfo, deleteRecord, dele
                 open={open}
                 PaperProps={{
                     sx: {
-                        minWidth: "30%",
-                        minHeight: "20%",
+                        minWidth: '30%',
+                        minHeight: '20%',
                         borderRadius: '8px'
                     }
                 }}
             >
-                <DialogTitle>
+                <DialogTitle sx={{padding:'2px'}}>
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
@@ -510,22 +515,24 @@ export const DeleteDialog = ({ open, handleClose, deleteInfo, deleteRecord, dele
                         <CloseIcon style={{ height: '18px', color: '#000000' }} />
                     </IconButton>
                 </DialogTitle>
-                <DialogContent>
-                    <HighlightOffOutlinedIcon sx={{ fontSize: '90px', color: '#ff3c36', fontWeight: 400 }} />
-                    <Typography sx={{ fontSize: '37px' }}>Are You Sure?</Typography>
+                <DialogContent sx={{padding:'2px'}}>
+                    <div style={{display:'flex',justifyContent:'center'}}> 
+                    <HighlightOffOutlinedIcon sx={{ fontSize: '150px', color: '#ff3c36'}} />
+                    </div>
+                    <Typography sx={{ fontSize: '37px' ,textAlign:'center'}}>Are You Sure ?</Typography>
                     {deleteInfo && (
                         <>
-                            <Typography sx={{ fontSize: '37px' }}>
+                            <Typography sx={{ fontSize: '17px',textAlign:'center',margin:'0px 22px' }}>
                                 Do you really want to delete these records? #{displayName}
                             </Typography>
                         </>
                     )}
                 </DialogContent>
                 <DialogActions sx={{ padding: '10px' }}>
-                    <Button onClick={handleClose} variant='outlined'>
+                    <Button onClick={handleClose} variant='outlined' sx={{color:'#000000',border:'1px solid #000000',fontSize:'12px'}}>
                         No
                     </Button>
-                    <Button onClick={() => deleteRecord(deleteID)} variant='outlined'>
+                    <Button onClick={() => deleteRecord(deleteID)} variant='outlined'sx={{color:'#ff3c36',border:'1px solid #ff3c36',fontSize:'12px'}}>
                         Yes
                     </Button>
                 </DialogActions>

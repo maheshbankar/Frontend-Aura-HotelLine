@@ -9,7 +9,7 @@ import {
     TableBody
 } from '@mui/material';
 import styles from '.././../../styles.module.css';
-import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
+import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, DeleteDialog, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -40,8 +40,12 @@ const ItemCategoryList = () => {
     const handleClickOpenPopup = (info) => {
         setInfo(info);
         setOpenPopup(true);
-        setOpenOption(info.id ? 'BankUpdate' : 'BankAdd')
-
+        setOpenOption(info.id ? 'Update' : 'Add')
+    };
+    const handleClickOpenPopupAdd = () => {
+        setInfo(undefined);
+        setOpenPopup(true);
+        setOpenOption('Add')
     };
     const tableRef = useRef(null);
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
@@ -189,17 +193,7 @@ const ItemCategoryList = () => {
         });
     }
     const [sortBy, setSortBy] = useState(null);
-    const handleSort = (property) => {
-        const isAsc = sortBy === property && sortBy !== null;
-        setSortBy(isAsc ? property + '_desc' : property);
-        rows.sort((a, b) => {
-            if (typeof a[property] === 'number' && typeof b[property] === 'number') {
-                return isAsc ? a[property] - b[property] : b[property] - a[property];
-            } else {
-                return isAsc ? a[property].localeCompare(b[property]) : b[property].localeCompare(a[property]);
-            }
-        });
-    };
+
     const handleCloseSuccessMsg = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -221,13 +215,11 @@ const ItemCategoryList = () => {
 
     return (
         <>
-
-
             <Paper className={`${styles.list_container}`}>
                 <Breadcrumb
                     routeSegments={[
-                        { name:  t('masters') , path: '/masters/' },
-                        { name: 'Item Category' },
+                        { name: t('masters'), path: '/masters/' },
+                        { name: t('item_category') },
                     ]}
                 />
                 <Box sx={{ display: 'flex' }}>
@@ -241,21 +233,8 @@ const ItemCategoryList = () => {
                                     data={rows}
                                     fields={fields}
                                     labels={labels}
-                                    filename="Bank List"
+                                    filename={t('item_list')}
                                 />
-                            </Box>
-                            <Box className={`${styles.excel_box}`}>
-                                {/* <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    name="file"
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileChange}
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                />
-                                <Tooltip title="Upload Excel File">
-                                    <span onClick={handleUpload} htmlFor="file-upload"> <img src={upload_excel} style={{ height: "20px", width: "20" }} /> </span>
-                                </Tooltip> */}
                             </Box>
                             <TextField
                                 fullWidth
@@ -268,7 +247,7 @@ const ItemCategoryList = () => {
                                 }}
                                 type="search"
                                 name="search"
-                                placeholder="Search"
+                                placeholder={t('search')}
                                 value={q}
                                 size="small"
                                 onChange={(e) => setQ(e.target.value)}
@@ -284,19 +263,10 @@ const ItemCategoryList = () => {
                                 }}
                             />
                             {/* <NavLink to={{ pathname: `/masters/add-bank-masters` }} > */}
-                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
-                                <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
+                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopupAdd}>
+                                <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> {t('create_new')}
                             </Button>
                             {/* </NavLink> */}
-                        </Grid>
-                        <Grid item md={12} >
-                            {/* <a href={`${fileDownloadURL}SampleFileBank.csv`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                            >
-                                <Typography className={`${styles.erp_lable}`} style={{ textDecoration: 'underline', display: 'flex', float: 'right' }}> Download Sample File </Typography>
-                            </a> */}
                         </Grid>
                     </Grid>
                 </Box>
@@ -304,8 +274,8 @@ const ItemCategoryList = () => {
                     <Table size="small" stickyHeader>
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell align="center" className={`${styles.table_head}`}>Action</StyledTableCell>
-                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_category')}>Item Category <span className={`${styles.sort_icon}`}> {sortBy === 'item_category' ? '▲' : '▼'} </span></StyledTableCell>
+                                <StyledTableCell align="center" className={`${styles.table_head}`}>{t('action')}</StyledTableCell>
+                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_category')}>{t('item_category')} <span className={`${styles.sort_icon}`}> {sortBy === 'item_category' ? '▲' : '▼'} </span></StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>
@@ -345,11 +315,12 @@ const ItemCategoryList = () => {
 
                                                                     <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleClickOpenPopup(row); popupState.close() }}>
                                                                         <EditIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />
-                                                                        <span style={{ marginRight: '13px' }}> Edit Record</span> </Button>
+                                                                        <span style={{ marginRight: '13px' }}> {t('edit_record')}</span> </Button>
                                                                     <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleDelete(row); popupState.close() }}>
                                                                         {/* <Icon icon="ic:baseline-delete-forever" color="#c70000" width="20" height="20" />  */}
-                                                                        <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />  Delete Record</Button>
+                                                                        <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} /> {t('delete_record')}</Button>
                                                                 </>
+
                                                             </Container>
                                                         </Popover>
                                                     </div>
@@ -380,39 +351,14 @@ const ItemCategoryList = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <Dialog open={isDelete}
-                PaperProps={{
-                    sx: {
-                        minWidth: "35%",
-                        minHeight: "22%",
-                        borderRadius: '8px'
-                    }
-                }}>
-                <DialogTitle className={`${styles.dilog_delete_title}`}>
-                    Confirm Delete The Record?
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{
-                            right: 0,
-                            top: 0,
-                            float: 'right'
-                        }} >
-                        <CloseIcon style={{ height: '18px', color: '#000000' }} />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent className={`${styles.dilog_delete_content}`}>
-                    The BillCube will remove this record # {deleteInfo && deleteInfo.item_category}
-                </DialogContent>
-                <DialogActions sx={{ padding: '10px', }}>
-                    <Button onClick={handleClose} className={`${styles.dilog_delete_no_btn}`} variant='outlined'>
-                        No
-                    </Button>
-                    <Button onClick={() => deleteRecord(deleteInfo.id)} className={`${styles.dilog_delete_yes_btn}`} variant='outlined'>
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteDialog
+                open={isDelete}
+                handleClose={handleClose}
+                deleteInfo={deleteInfo}
+                deleteRecord={deleteRecord}
+                deleteID={deleteInfo?.id || null}
+                displayName={deleteInfo?.item_category || ''}
+            />
             <BootstrapDialog
                 PaperProps={{
                     sx: {
@@ -423,17 +369,22 @@ const ItemCategoryList = () => {
                             lg: '40%',  // For large screens (desktops)
                         },
                         maxWidth: '90%',
-                        maxHeight: 600,
+                        maxHeight: 500,
                         minWidth: '30%',
-                        minHeight: 160,
+                        minHeight: {
+                            xs: 300,  // For extra-small screens (mobile)
+                            sm: 200,  // For small screens (tablets)
+                            md: 200,  // For medium screens (laptops)
+                            lg: 100,  // For large screens (desktops)
+                        },
                     },
                 }}
                 onClose={handleClose}
                 open={openPopup}
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} >
-                    {openOption === 'BankAdd' && 'Create Category'}
-                    {openOption === 'BankUpdate' && 'Update Category'}
+                    {openOption === 'Add' && 'Create Category'}
+                    {openOption === 'Update' && 'Update Category'}
                 </BootstrapDialogTitle>
                 <DialogContent dividers >
                     <ItemCategoryAdd handleCloseDialog={handleClose} details={info}

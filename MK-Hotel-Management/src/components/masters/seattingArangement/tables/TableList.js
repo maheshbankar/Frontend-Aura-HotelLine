@@ -9,7 +9,7 @@ import {
     TableBody
 } from '@mui/material';
 import styles from '.././../../../styles.module.css';
-import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../../reusableComponent/reusableMethods";
+import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, DeleteDialog, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../../reusableComponent/reusableMethods";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -42,6 +42,12 @@ const TableList = () => {
         setOpenOption(info.id ? 'BankUpdate' : 'BankAdd')
 
     };
+    const handleClickOpenPopupAdd = () => {
+        setInfo(undefined);
+        setOpenPopup(true);
+        setOpenOption('BankAdd')
+
+    };
     const tableRef = useRef(null);
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const [page, setPage] = React.useState(0)
@@ -64,11 +70,11 @@ const TableList = () => {
     const [q, setQ] = useState("");
     const searchParam = [
         "table_name", "status", "seating_type"
-      ];
-    
-      const fields = ['id',  "table_name", "status", "seating_type"];
-      const labels = ['ID',  "table_name", "status", "seating_type"];
-    
+    ];
+
+    const fields = ['id', "table_name", "status", "seating_type"];
+    const labels = ['ID', "table_name", "status", "seating_type"];
+
 
     const [isDelete, setIsDelete] = useState(false);
     const [deleteInfo, setDeleteInfo] = useState();
@@ -83,7 +89,7 @@ const TableList = () => {
         { id: 8, table_name: 'Table H', status: false, seating_type: 'Garden' },
         { id: 9, table_name: 'Table I', status: true, seating_type: 'Family Room' },
         { id: 10, table_name: 'Table J', status: false, seating_type: 'Hall' },
-      ];
+    ];
     // const rows = useSelector(state => state.bank.bank)
     // const fetchData = () => {
     //     dispatch(getBankList({ companyId: userInfo.companyId }))
@@ -199,7 +205,7 @@ const TableList = () => {
                 <Breadcrumb
                     routeSegments={[
                         { name: 'Masters', path: '/masters/' },
-                        { name: 'Item Type' },
+                        { name: 'Tables' },
                     ]}
                 />
                 <Box sx={{ display: 'flex' }}>
@@ -213,21 +219,8 @@ const TableList = () => {
                                     data={rows}
                                     fields={fields}
                                     labels={labels}
-                                    filename="Bank List"
+                                    filename="Tables List"
                                 />
-                            </Box>
-                            <Box className={`${styles.excel_box}`}>
-                                {/* <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    name="file"
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileChange}
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                />
-                                <Tooltip title="Upload Excel File">
-                                    <span onClick={handleUpload} htmlFor="file-upload"> <img src={upload_excel} style={{ height: "20px", width: "20" }} /> </span>
-                                </Tooltip> */}
                             </Box>
                             <TextField
                                 fullWidth
@@ -256,19 +249,10 @@ const TableList = () => {
                                 }}
                             />
                             {/* <NavLink to={{ pathname: `/masters/add-bank-masters` }} > */}
-                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
+                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopupAdd}>
                                 <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
                             </Button>
                             {/* </NavLink> */}
-                        </Grid>
-                        <Grid item md={12} >
-                            {/* <a href={`${fileDownloadURL}SampleFileBank.csv`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                            >
-                                <Typography className={`${styles.erp_lable}`} style={{ textDecoration: 'underline', display: 'flex', float: 'right' }}> Download Sample File </Typography>
-                            </a> */}
                         </Grid>
                     </Grid>
                 </Box>
@@ -289,8 +273,11 @@ const TableList = () => {
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>
-                            {rows
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            {rows && search(rows)
+                                .slice(
+                                    page * rowsPerPage,
+                                    page * rowsPerPage + rowsPerPage
+                                )
                                 .map((row, index) => (
                                     <StyledTableRow
                                         key={row.id}
@@ -358,39 +345,14 @@ const TableList = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <Dialog open={isDelete}
-                PaperProps={{
-                    sx: {
-                        minWidth: "35%",
-                        minHeight: "22%",
-                        borderRadius: '8px'
-                    }
-                }}>
-                <DialogTitle className={`${styles.dilog_delete_title}`}>
-                    Confirm Delete The Record?
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{
-                            right: 0,
-                            top: 0,
-                            float: 'right'
-                        }} >
-                        <CloseIcon style={{ height: '18px', color: '#000000' }} />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent className={`${styles.dilog_delete_content}`}>
-                    The BillCube will remove this record # {deleteInfo && deleteInfo.item_category}
-                </DialogContent>
-                <DialogActions sx={{ padding: '10px', }}>
-                    <Button onClick={handleClose} className={`${styles.dilog_delete_no_btn}`} variant='outlined'>
-                        No
-                    </Button>
-                    <Button onClick={() => deleteRecord(deleteInfo.id)} className={`${styles.dilog_delete_yes_btn}`} variant='outlined'>
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteDialog
+                open={isDelete}
+                handleClose={handleClose}
+                deleteInfo={deleteInfo}
+                deleteRecord={deleteRecord}
+                deleteID={deleteInfo?.id || null}
+                displayName={deleteInfo?.table_name || ''}
+            />
             <BootstrapDialog
                 PaperProps={{
                     sx: {
@@ -410,8 +372,8 @@ const TableList = () => {
                 open={openPopup}
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose} >
-                    {openOption === 'BankAdd' && 'Create Item'}
-                    {openOption === 'BankUpdate' && 'Update Item'}
+                    {openOption === 'BankAdd' && 'Create Table'}
+                    {openOption === 'BankUpdate' && 'Update Table'}
                 </BootstrapDialogTitle>
                 <DialogContent dividers >
                     <TableAdd handleCloseDialog={handleClose} details={info}
@@ -419,13 +381,6 @@ const TableList = () => {
                     />
                 </DialogContent>
             </BootstrapDialog>
-
-            {/* {deleteMessage &&
-                <DeleteSnackbar
-                    open={deleteMessage ? true : false}
-                    message={deleteMessage}
-                />
-            } */}
 
             {/* {successMessage &&
                 <Snackbar

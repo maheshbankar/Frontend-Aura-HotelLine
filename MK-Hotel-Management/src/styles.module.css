@@ -18,7 +18,13 @@
   margin-right: 10px;
   height: 60vh !important;
 }
-
+.add_container {
+  margin-top: 10px !important;
+  margin-bottom: 5px !important;
+  box-shadow: none !important;
+  margin-left: 10px;
+  margin-right: 10px;
+}
 .page_title {
   color: #00bdf7;
   /* padding-left: 10px !important; */
@@ -118,7 +124,7 @@
 
 .grid_lable {
   padding-right: 10px;
-  padding-left: 30px !important;
+  /* padding-left: 3px !important; */
 }
 
 .erp_lable {
@@ -127,11 +133,11 @@
 }
 
 .grid_input {
-  padding-right: 30px;
+  /* padding-right: 30px; */
 }
 
 #btn_save {
-  width: 150px;
+  width: 100px;
   float: right !important;
   background-image: linear-gradient(#00527c, #00527c);
   border: 0;
@@ -254,4 +260,8 @@
   font-size: 12px !important;
   font-weight: 500;
   color: #000000 !important
+}
+.add_icon{
+  font-size: 18px !important;
+  margin-right:8px;
 }

@@ -14,6 +14,7 @@ import TableList from '../masters/seattingArangement/tables/TableList';
 import SatingTypeList from '../masters/seattingArangement/seatingType/SatingTypeList';
 import Order from '../order/Order';
 import MastersHome from '../masters/MastersHome';
+import OrderPripration from '../order/OrderPripration';
 
 export default function AuraRoutes() {
   const { isDarkMode } = useTheme();
@@ -37,6 +38,7 @@ export default function AuraRoutes() {
           <Route path="/employee-type" element={<EmployeeTypeList />} /> 
           <Route path="/seating-type" element={<SatingTypeList />} /> 
           <Route path="/table" element={<TableList />} />
+          <Route path="/table-selection" element={<OrderPripration />} />
           <Route path="/order" element={<Order />} />
           <Route path="/masters" element={<MastersHome />} />
         </Route>

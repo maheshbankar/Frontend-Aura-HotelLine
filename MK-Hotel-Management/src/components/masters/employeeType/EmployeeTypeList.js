@@ -9,7 +9,7 @@ import {
     TableBody
 } from '@mui/material';
 import styles from '.././../../styles.module.css';
-import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
+import { BootstrapDialog, BootstrapDialogTitle, Breadcrumb, DeleteDialog, ExcelDownload, HandleSort, StyledTableCell, StyledTableRow } from "../../reusableComponent/reusableMethods";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -30,7 +30,7 @@ const EmployeeTypeList = () => {
     const login_details = sessionStorage.getItem('loginUser');
     const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
-    
+
     const [openPopup, setOpenPopup] = React.useState(false);
     const [info, setInfo] = useState({});
     const [openOption, setOpenOption] = useState('');
@@ -40,6 +40,12 @@ const EmployeeTypeList = () => {
         setInfo(info);
         setOpenPopup(true);
         setOpenOption(info.id ? 'BankUpdate' : 'BankAdd')
+
+    };
+    const handleClickOpenPopupAdd = () => {
+        setInfo(undefined);
+        setOpenPopup(true);
+        setOpenOption('BankAdd')
 
     };
     const tableRef = useRef(null);
@@ -63,64 +69,57 @@ const EmployeeTypeList = () => {
 
     const [q, setQ] = useState("");
     const [searchParam] = useState([
-        "item_category", 
-        "item_type", 
-        "item_name", 
-        "item_price", 
-        "item_in_half", 
-        "item_half_price", 
-        "item_image", 
-        "status"
-      ]);
+        "employee_type",
+    ]);
 
-      const fields = ['id', 'item_category', 'item_type', 'item_name', 'item_price', 'item_in_half', 'item_half_price', 'item_image', 'status'];
-      const labels = ['ID', 'Item Category', 'Item Type', 'Item Name', 'Item Price', 'Item in Half', 'Item Half Price', 'Item Image', 'Status'];
-      
+    const fields = ['id', 'employee_type', ];
+    const labels = ['ID', 'employee_type',];
+
 
     const [isDelete, setIsDelete] = useState(false);
     const [deleteInfo, setDeleteInfo] = useState();
     const rows = [
         {
-          id: 1,
-          item_category: "Veg"
+            id: 1,
+            employee_type: "Cook"
         },
         {
-          id: 2,
-          item_category: "Nonveg"
+            id: 2,
+            employee_type: "Weter"
         },
         {
-          id: 3,
-          item_category: "Coldrinks"
+            id: 3,
+            employee_type: "Security"
         },
         {
-          id: 4,
-          item_category: "Hots"
+            id: 4,
+            employee_type: "Hots"
         },
         {
-          id: 5,
-          item_category: "Snacks"
+            id: 5,
+            employee_type: "Snacks"
         },
         {
-          id: 6,
-          item_category: "Desserts"
+            id: 6,
+            employee_type: "Desserts"
         },
         {
-          id: 7,
-          item_category: "Juices"
+            id: 7,
+            employee_type: "Juices"
         },
         {
-          id: 8,
-          item_category: "Fast Food"
+            id: 8,
+            employee_type: "Fast Food"
         },
         {
-          id: 9,
-          item_category: "Salads"
+            id: 9,
+            employee_type: "Salads"
         },
         {
-          id: 10,
-          item_category: "Sweets"
+            id: 10,
+            employee_type: "Sweets"
         },
-      ];
+    ];
     // const rows = useSelector(state => state.bank.bank)
     // const fetchData = () => {
     //     dispatch(getBankList({ companyId: userInfo.companyId }))
@@ -156,7 +155,7 @@ const EmployeeTypeList = () => {
                 }
             }
         }
-    }, [shouldShowMsg, responseMessage, 
+    }, [shouldShowMsg, responseMessage,
         // fetchData
     ]);
 
@@ -164,7 +163,7 @@ const EmployeeTypeList = () => {
         fileInputRef.current.click();
     };
 
-   
+
 
     const deleteRecord = (id) => {
         // dispatch(editDeleteBank({ id: deleteInfo.id, modifiedBy: userInfo.userId, modifiedAt: dateConversionOnEntryPage(new Date()), changedUpdatedValue: 'delete' }))
@@ -198,17 +197,7 @@ const EmployeeTypeList = () => {
         });
     }
     const [sortBy, setSortBy] = useState(null);
-    const handleSort = (property) => {
-        const isAsc = sortBy === property && sortBy !== null;
-        setSortBy(isAsc ? property + '_desc' : property);
-        rows.sort((a, b) => {
-            if (typeof a[property] === 'number' && typeof b[property] === 'number') {
-                return isAsc ? a[property] - b[property] : b[property] - a[property];
-            } else {
-                return isAsc ? a[property].localeCompare(b[property]) : b[property].localeCompare(a[property]);
-            }
-        });
-    };
+
     const handleCloseSuccessMsg = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -216,29 +205,18 @@ const EmployeeTypeList = () => {
         setSuccessMessage(false)
     };
 
-    const actionMsg = (
-        <React.Fragment>
-            <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleCloseSuccessMsg}>
-                <CloseIcon fontSize="small" />
-            </IconButton>
-        </React.Fragment>
-    );
 
     return (
         <>
-           
+
 
             <Paper className={`${styles.list_container}`}>
-            <Breadcrumb
-                routeSegments={[
-                    { name: 'Masters', path: '/masters/' },
-                    { name: 'Item Type' },
-                ]}
-            />
+                <Breadcrumb
+                    routeSegments={[
+                        { name: 'Masters', path: '/masters/' },
+                        { name: 'Employee Type' },
+                    ]}
+                />
                 <Box sx={{ display: 'flex' }}>
                     <Grid container spacing={0.2} sx={{ pt: 0.5, pb: 0.5 }}>
                         <Grid item md={7} xs={12}>
@@ -250,21 +228,8 @@ const EmployeeTypeList = () => {
                                     data={rows}
                                     fields={fields}
                                     labels={labels}
-                                    filename="Bank List"
+                                    filename="Employee Type List"
                                 />
-                            </Box>
-                            <Box className={`${styles.excel_box}`}>
-                                {/* <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    name="file"
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileChange}
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                                />
-                                <Tooltip title="Upload Excel File">
-                                    <span onClick={handleUpload} htmlFor="file-upload"> <img src={upload_excel} style={{ height: "20px", width: "20" }} /> </span>
-                                </Tooltip> */}
                             </Box>
                             <TextField
                                 fullWidth
@@ -293,19 +258,10 @@ const EmployeeTypeList = () => {
                                 }}
                             />
                             {/* <NavLink to={{ pathname: `/masters/add-bank-masters` }} > */}
-                                <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopup}>
-                                    <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
-                                </Button>
+                            <Button variant="contained" className={`${styles.add_btn}`} onClick={handleClickOpenPopupAdd}>
+                                <AddIcon viewBox="3 3 18 18" className={`${styles.add_icon}`} /> Create New
+                            </Button>
                             {/* </NavLink> */}
-                        </Grid>
-                        <Grid item md={12} >
-                            {/* <a href={`${fileDownloadURL}SampleFileBank.csv`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                download
-                            >
-                                <Typography className={`${styles.erp_lable}`} style={{ textDecoration: 'underline', display: 'flex', float: 'right' }}> Download Sample File </Typography>
-                            </a> */}
                         </Grid>
                     </Grid>
                 </Box>
@@ -313,8 +269,8 @@ const EmployeeTypeList = () => {
                     <Table size="small" stickyHeader>
                         <TableHead>
                             <StyledTableRow>
-                                <StyledTableCell   align="center" className={`${styles.table_head}`}>Action</StyledTableCell>
-                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('item_category')}>Item Category <span className={`${styles.sort_icon}`}> {sortBy === 'item_category' ? '▲' : '▼'} </span></StyledTableCell>
+                                <StyledTableCell align="center" className={`${styles.table_head}`}>Action</StyledTableCell>
+                                <StyledTableCell align="center" className={`${styles.table_head}`} onClick={() => HandleSort('employee_type')}>Employee Type <span className={`${styles.sort_icon}`}> {sortBy === 'item_category' ? '▲' : '▼'} </span></StyledTableCell>
                             </StyledTableRow>
                         </TableHead>
                         <TableBody>
@@ -351,13 +307,13 @@ const EmployeeTypeList = () => {
                                                         >
                                                             <Container className={`${styles.tbl_action}`}>
                                                                 <>
-                                                                   
-                                                                        <Button className={`${styles.list_tbl_action_btn}`} onClick={() => {handleClickOpenPopup(row);popupState.close()}}>
-                                                                            <EditIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />
-                                                                            <span style={{ marginRight: '13px' }}> Edit Record</span> </Button> 
+
+                                                                    <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleClickOpenPopup(row); popupState.close() }}>
+                                                                        <EditIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />
+                                                                        <span style={{ marginRight: '13px' }}> Edit Record</span> </Button>
                                                                     <Button className={`${styles.list_tbl_action_btn}`} onClick={() => { handleDelete(row); popupState.close() }}>
                                                                         {/* <Icon icon="ic:baseline-delete-forever" color="#c70000" width="20" height="20" />  */}
-                                                                       <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }}/>  Delete Record</Button>
+                                                                        <DeleteForeverIcon style={{ float: 'left', fontSize: '20px', cursor: 'pointer' }} />  Delete Record</Button>
                                                                 </>
                                                             </Container>
                                                         </Popover>
@@ -365,8 +321,8 @@ const EmployeeTypeList = () => {
                                                 )}
                                             </PopupState>
                                         </StyledTableCell>
-                                        <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.item_category}</StyledTableCell>
-                                       
+                                        <StyledTableCell align="center" className={`${styles.list_table_body}`}>{row.employee_type}</StyledTableCell>
+
                                     </StyledTableRow>
                                 ))}
                         </TableBody>
@@ -389,54 +345,29 @@ const EmployeeTypeList = () => {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <Dialog open={isDelete}
-                PaperProps={{
-                    sx: {
-                        minWidth: "35%",
-                        minHeight: "22%",
-                        borderRadius: '8px'
-                    }
-                }}>
-                <DialogTitle className={`${styles.dilog_delete_title}`}>
-                    Confirm Delete The Record?
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{
-                            right: 0,
-                            top: 0,
-                            float: 'right'
-                        }} >
-                        <CloseIcon style={{ height: '18px', color: '#000000' }} />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent className={`${styles.dilog_delete_content}`}>
-                    The BillCube will remove this record # {deleteInfo && deleteInfo.item_category}
-                </DialogContent>
-                <DialogActions sx={{ padding: '10px', }}>
-                    <Button onClick={handleClose} className={`${styles.dilog_delete_no_btn}`} variant='outlined'>
-                        No
-                    </Button>
-                    <Button onClick={() => deleteRecord(deleteInfo.id)} className={`${styles.dilog_delete_yes_btn}`} variant='outlined'>
-                        Yes
-                    </Button>
-                </DialogActions> 
-            </Dialog>
+            <DeleteDialog
+                open={isDelete}
+                handleClose={handleClose}
+                deleteInfo={deleteInfo}
+                deleteRecord={deleteRecord}
+                deleteID={deleteInfo?.id || null}
+                displayName={deleteInfo?.employee_type || ''}
+            />
             <BootstrapDialog
                 PaperProps={{
                     sx: {
-                      width: {
-                        xs: '90%',  // For extra-small screens (mobile)
-                        sm: '80%',  // For small screens (tablets)
-                        md: '50%',  // For medium screens (laptops)
-                        lg: '40%',  // For large screens (desktops)
-                      },
-                      maxWidth: '90%',
-                      maxHeight: 600,
-                      minWidth: '30%',
-                      minHeight: 160,
+                        width: {
+                            xs: '80%',  // For extra-small screens (mobile)
+                            sm: '50%',  // For small screens (tablets)
+                            md: '50%',  // For medium screens (laptops)
+                            lg: '30%',  // For large screens (desktops)
+                        },
+                        maxWidth: '90%',
+                        maxHeight: 600,
+                        minWidth: '30%',
+                        minHeight: 160,
                     },
-                  }}
+                }}
                 onClose={handleClose}
                 open={openPopup}
             >
@@ -445,7 +376,7 @@ const EmployeeTypeList = () => {
                     {openOption === 'BankUpdate' && 'Update Item'}
                 </BootstrapDialogTitle>
                 <DialogContent dividers >
-                    <EmployeeTypeAdd handleCloseDialog={handleClose} details={info} 
+                    <EmployeeTypeAdd handleCloseDialog={handleClose} details={info}
                     // onAPISubmt={fetchData} 
                     />
                 </DialogContent>

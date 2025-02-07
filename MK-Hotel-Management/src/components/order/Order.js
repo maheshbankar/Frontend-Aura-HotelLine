@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from '.././../styles.module.css';
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Divider, Grid, Paper, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Divider, Grid, Paper, Snackbar, TextField, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { Breadcrumb, Cancel, HMinput, HMinputNo, StyledTableCell, StyledTableRow } from "../reusableComponent/reusableMethods";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import BookmarkAddedSharpIcon from '@mui/icons-material/BookmarkAddedSharp';
+import BookmarkAddSharpIcon from '@mui/icons-material/BookmarkAddSharp';
 import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -22,21 +24,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import IconButton from '@mui/material/IconButton';
+import ReactToPrint from "react-to-print";
 import tblBg from "../../images/tbl-bg.png"
 import menuImg from "../../images/menu-sample.png"
 import SaveIcon from '@mui/icons-material/Save';
-const tables = [
-    { id: 1, table_name: 'Table A', status: true, seating_type: 'Hall' },
-    { id: 2, table_name: 'Table B', status: false, seating_type: 'Garden' },
-    { id: 3, table_name: 'Table C', status: true, seating_type: 'Family Room' },
-    { id: 4, table_name: 'Table D', status: false, seating_type: 'Hall' },
-    { id: 5, table_name: 'Table E', status: true, seating_type: 'Garden' },
-    { id: 6, table_name: 'Table F', status: false, seating_type: 'Family Room' },
-    { id: 7, table_name: 'Table G', status: true, seating_type: 'Hall' },
-    { id: 8, table_name: 'Table H', status: false, seating_type: 'Garden' },
-    { id: 9, table_name: 'Table I', status: true, seating_type: 'Family Room' },
-    { id: 10, table_name: 'Table J', status: false, seating_type: 'Hall' },
-];
+import PrintOrder from "./PrintOrder";
+console.log(PrintOrder, 'testprint');
+
 const menuItems = [
     { id: 1, item_category: 'Veg', item_type: 'Sweet', item_name: 'Kheer', item_price: 799, item_in_half: true, item_half_price: 399, item_image: 'link_to_image1', status: 'Available' },
     { id: 2, item_category: 'Veg', item_type: 'Main Course', item_name: 'Paneer Butter Masala', item_price: 599, item_in_half: false, item_half_price: null, item_image: 'link_to_image2', status: 'Available' },
@@ -86,8 +80,8 @@ const Order = (props) => {
     // const login_details = sessionStorage.getItem('loginUser');
     // const userD = JSON.parse(login_details);
     // const userInfo = userD.userInfo;
-    // const urlLocation = useLocation();
-    // const editInfo = urlLocation.state;
+    const urlLocation = useLocation();
+    const tableInfo = urlLocation.state;
 
     const editid = editData ? editData.id : null;
     let navigate = useNavigate();
@@ -108,7 +102,15 @@ const Order = (props) => {
         });
         data[target.name] = target.value;
     }
+    // -----------------------
+    const [open, setOpen] = useState(false);
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
 
+        setOpen(false);
+    };
     // const [shouldShowMsg, setShouldShowMsg] = useState(false);
     // const responseMessage = useSelector(state => state.bank.message); 
 
@@ -162,13 +164,7 @@ const Order = (props) => {
         setValue(newValue);
     };
     // --------------------------
-    const groupedTables = tables.reduce((acc, table) => {
-        if (!acc[table.seating_type]) {
-            acc[table.seating_type] = [];
-        }
-        acc[table.seating_type].push(table);
-        return acc;
-    }, {});
+
     // ---------------------------------
     const groupedMenuItems = menuItems.reduce((acc, item) => {
         if (!acc[item.item_category]) {
@@ -243,6 +239,8 @@ const Order = (props) => {
         setTotal(totalCount);
     };
 
+    const [itemMsg, setItemMsg] = useState();
+    const [itemOne, setItemOne] = useState(false);
     const handleAddSPQuotationFields = (item) => {
         // Check if the item is already in the table based on its unique id (or combination of item_name and item_price)
         const isItemInDetails = supplier_po_details.some(detail => detail.item_name === item.item_name && detail.item_price === item.item_price);
@@ -250,6 +248,9 @@ const Order = (props) => {
         // Prevent adding the item if it already exists
         if (isItemInDetails) {
             console.log('Item already exists');
+            setOpen(true);
+            setItemMsg('Item already exists')
+            setItemOne(true)
             return; // Don't add the item again
         }
 
@@ -275,30 +276,38 @@ const Order = (props) => {
     };
     const handleChangeQuantity = (index, operation) => {
         const updatedDetails = [...supplier_po_details]; // Create a shallow copy of the array
-    
+
         // Get the current item
         const updatedItem = { ...updatedDetails[index] };
-    
+
         // Update the quantity based on the operation
         if (operation === 'increment') {
             updatedItem.quantity += 1;
         } else if (operation === 'decrement' && updatedItem.quantity > 1) {
             updatedItem.quantity -= 1; // Prevent going below 1
         }
-    
+
         // Recalculate the total based on updated quantity
         updatedItem.total = updatedItem.quantity * updatedItem.item_price;
         updatedItem.amount = updatedItem.total;
-    
+
         // Update the item in the copied array
         updatedDetails[index] = updatedItem;
-    
+
         // Update the state with the new array
         setSupplier_po_details(updatedDetails);
-    
+
         // Recalculate the total amount for all items
         const totalCount = updatedDetails.map(item => item.total || 0).reduce((acc, curr) => acc + curr, 0);
         setTotal(totalCount);
+    };
+    // ---------------------- 
+    const printRef = useRef();
+    const handleSaveAndPrint = () => {
+        // onSubmit(); 
+        // setTimeout(() => {
+        //     componentRef.current && componentRef.current.handlePrint(); 
+        // }, 1000); 
     };
     return (
         <>
@@ -319,65 +328,13 @@ const Order = (props) => {
                                     <Box sx={{ width: '100%' }}>
                                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                                                <Tab label="Tables" {...a11yProps(0)} />
-                                                <Tab label="Menu" {...a11yProps(1)} />
+                                                <Tab label="Menu" {...a11yProps(0)} />
+                                                {/* <Tab label="Menu" {...a11yProps(1)} /> */}
                                                 {/* <Tab label="Non-Veg" {...a11yProps(2)} /> */}
                                             </Tabs>
                                         </Box>
-                                        <CustomTabPanel value={value} index={0}>
-                                            <div>
-                                                {Object.keys(groupedTables).map((seatingType) => (
-                                                    <div key={seatingType}>
-                                                        {/* Group Title */}
-                                                        <Typography variant="h6" sx={{ marginTop: 2, fontWeight: 'bold' }}>
-                                                            {seatingType}
-                                                        </Typography>
-                                                        <Divider sx={{ marginBottom: 2 }} />
 
-                                                        {/* Step 3: Use MUI Grid to display cards in a responsive layout */}
-                                                        <Grid container spacing={2}>
-                                                            {groupedTables[seatingType].map((table) => (
-                                                                <Grid item xs={12} sm={4} md={3} key={table.id}>
-                                                                    {/* Card */}
-                                                                    <Card sx={{ maxWidth: 345 }}>
-                                                                        <CardHeader
-                                                                            avatar={
-                                                                                <Avatar
-                                                                                    sx={{
-                                                                                        bgcolor: table.status ? '#4caf50' : '#f44336', // Green for available, Red for occupied
-                                                                                    }}
-                                                                                    aria-label="table status"
-                                                                                >
-                                                                                    {table.status ? '✔️' : '❌'} {/* Show a check or cross depending on status */}
-                                                                                </Avatar>
-                                                                            }
-                                                                            title={table.table_name} // Use the table name as the title
-                                                                            subheader={table.seating_type} // Optionally, you can show the seating type here
-                                                                        />
-                                                                        <CardMedia
-                                                                            component="img"
-                                                                            sx={{
-                                                                                width: '100%',
-                                                                                height: 'auto',
-                                                                                objectFit: 'cover',
-                                                                            }}
-                                                                            image={tblBg} // Replace with your actual image path or dynamic data
-                                                                            alt="Table image"
-                                                                        />
-                                                                        {/* <CardActions disableSpacing>
-                                                                            <IconButton aria-label="add to favorites">
-                                                                                <FavoriteIcon />
-                                                                            </IconButton>
-                                                                        </CardActions> */}
-                                                                    </Card>
-                                                                </Grid>
-                                                            ))}
-                                                        </Grid>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </CustomTabPanel>
-                                        <CustomTabPanel value={value} index={1}>
+                                        <CustomTabPanel value={value} index={0}>
                                             <div>
                                                 {Object.keys(groupedMenuItems).map((category) => (
                                                     <div key={category}>
@@ -390,27 +347,29 @@ const Order = (props) => {
                                                         {/* Step 3: Use MUI Grid to display cards in a responsive layout */}
                                                         <Grid container spacing={2}>
                                                             {groupedMenuItems[category].map((item) => (
-                                                                <Grid item xs={12} sm={4} md={3} key={item.id}>
+                                                                <Grid item xs={12} sm={4} md={2} key={item.id}>
                                                                     {/* Card */}
                                                                     <Card sx={{ maxWidth: 345 }} onClick={() => handleAddSPQuotationFields(item)} >
-                                                                        <CardHeader
-                                                                            avatar={
-                                                                                <Avatar
-                                                                                    sx={{
-                                                                                        bgcolor: item.status === 'Available' ? '#4caf50' : '#f44336', // Green for available, Red for unavailable
-                                                                                    }}
-                                                                                    aria-label="item status"
-                                                                                >
-                                                                                    {item.status === 'Available' ? '✔️' : '❌'}
-                                                                                </Avatar>
-                                                                            }
-                                                                            title={item.item_name} // Use the item name as the title
-                                                                            subheader={item.item_type} // Optionally, you can show the item type here
+                                                                        <CardHeader sx={{ height: '5vh', borderBottom: '1px solid #c0c0c0', bgcolor: '#fcba03', padding: '8px' }}
+                                                                            // avatar={
+                                                                            //     <Avatar
+                                                                            //         sx={{
+                                                                            //             bgcolor: item.status === 'Available' ? '#4caf50' : '#f44336', // Green for available, Red for unavailable
+                                                                            //         }}
+                                                                            //         aria-label="item status"
+                                                                            //     >
+                                                                            //         {item.status === 'Available' ? '✔️' : '❌'}
+                                                                            //     </Avatar>
+                                                                            // }
+                                                                            // title={item.item_name} 
+                                                                            subheader=
+                                                                            {<Typography sx={{ fontSize: '12px' }}>{item.item_name} </Typography>}
                                                                         />
                                                                         <CardMedia
                                                                             component="img"
                                                                             sx={{
                                                                                 width: '100%',
+                                                                                padding: '15px',
                                                                                 height: 'auto',
                                                                                 objectFit: 'cover',
                                                                             }}
@@ -421,13 +380,19 @@ const Order = (props) => {
                                                                             <Typography variant="body2" sx={{ marginRight: '8px' }}>
                                                                                 ₹{item.item_price}
                                                                             </Typography>
-                                                                            {item.item_in_half && (
+                                                                            {/* {item.item_in_half && (
                                                                                 <Typography variant="body2" sx={{ color: 'gray' }}>
                                                                                     Half: ₹{item.item_half_price}
                                                                                 </Typography>
-                                                                            )}
+                                                                            )} */}
                                                                             <IconButton aria-label="add to favorites">
-                                                                                <FavoriteIcon />
+                                                                                {itemOne == false ?
+                                                                                    <BookmarkAddSharpIcon sx={{
+                                                                                        color: item.status === 'Available' ? '#4caf50' : '#f44336', // Green for available, Red for unavailable
+                                                                                    }} />
+                                                                                    : <BookmarkAddedSharpIcon sx={{
+                                                                                        color: item.status === 'Available' ? '#4caf50' : '#f44336', // Green for available, Red for unavailable
+                                                                                    }} />}
                                                                             </IconButton>
                                                                         </CardActions>
                                                                     </Card>
@@ -444,6 +409,7 @@ const Order = (props) => {
                                     </Box>
                                 </Grid>
                                 <Grid item xs={12} md={4}>
+                                    <Typography sx={{ bgcolor: tableInfo.status ? '#4caf50' : '#f44336', }}>{tableInfo.table_name}( {tableInfo.seating_type}) </Typography>
                                     <TableContainer style={{ maxHeight: '450px', minHeight: '448px', marginTop: '5px' }}>
                                         <Table sx={{ minWidth: 50 }} size="small" aria-label="a dense table">
                                             <TableHead>
@@ -451,7 +417,7 @@ const Order = (props) => {
                                                     <StyledTableCell align="center" className={`${styles.table_head}`}></StyledTableCell>
                                                     <StyledTableCell align="left" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }} width="15%">Sr. No</StyledTableCell>
                                                     <StyledTableCell align="left" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }} width="35%">Item Name</StyledTableCell>
-                                                    <StyledTableCell align="center" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}width="18%">Qty</StyledTableCell>
+                                                    <StyledTableCell align="center" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }} width="18%">Qty</StyledTableCell>
                                                     <StyledTableCell align="center" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}>Price</StyledTableCell>
                                                     <StyledTableCell align="right" className={`${styles.table_head}`} sx={{ backgroundColor: '#ededed', fontSize: '12px' }}>Amount</StyledTableCell>
                                                 </StyledTableRow>
@@ -488,7 +454,7 @@ const Order = (props) => {
                                                                     onClick={() => handleChangeQuantity(index, 'decrement')}
                                                                     sx={{ fontSize: '16px', color: '#1b52d1' }}
                                                                 >
-                                                                  -  {/* <RemoveIcon sx={{ fontSize: '16px' }} /> */}
+                                                                    -  {/* <RemoveIcon sx={{ fontSize: '16px' }} /> */}
                                                                 </IconButton>
 
                                                                 <HMinputNo
@@ -559,9 +525,14 @@ const Order = (props) => {
                                             <Button variant="contained" color="primary" sx={{ flex: 1, marginRight: 1 }}>
                                                 Save
                                             </Button>
-                                            <Button variant="contained" color="primary" sx={{ flex: 1, marginRight: 1 }}>
-                                                Save and Print
-                                            </Button>
+                                            {/* <button onClick={handleSaveAndPrint}>Save and Print Bill</button> */}
+
+                                            <ReactToPrint
+                                                trigger={() => <Button variant="contained" color="primary" sx={{ flex: 1, marginRight: 1 }}>
+                                                    Save and Print
+                                                </Button>}  // Print trigger button
+                                                content={() => printRef.current}  // Use the ref here
+                                            />
                                             <Button variant="contained" color="secondary" sx={{ flex: 1, marginRight: 1 }}>
                                                 KOT
                                             </Button>
@@ -574,23 +545,25 @@ const Order = (props) => {
                             </Grid>
                         </Box>
                     </form>
+
+                    <div style={{ display: 'none' }}>
+                        <PrintOrder ref={printRef} tableInfo={tableInfo} />
+                    </div>
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                        open={open}
+                        autoHideDuration={4000}
+                        onClose={handleClose}
+                    >
+                        {/* Use the Alert component with severity="warning" */}
+                        <Alert onClose={handleClose} severity="warning" sx={{ width: '100%' }}>
+                            {itemMsg}
+                        </Alert>
+                    </Snackbar>
                 </Paper>
-                {/* <Snackbar
-                open={openSnak}
-                autoHideDuration={4000}
-                onClose={handleCloseSnak}
-                message="Do you wish to close without saving ?"
-                action={action}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            />
-            {successMessage &&
-                <Snackbar
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                    open={successMessage}
-                    autoHideDuration={2000}
-                    message={successMessage}
-                />
-            } */}
             </div>
         </>
     )

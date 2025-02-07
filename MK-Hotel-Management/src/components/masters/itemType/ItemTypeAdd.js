@@ -27,7 +27,7 @@ const ItemTypeAdd = (props) =>{
 
     const [data, setData] = useState({
         id: editid,
-        item_category: editData ? editData.item_category : '',
+        item_type: editData ? editData.item_type : '',
     });
 
     const date_ob = new Date();
@@ -136,18 +136,18 @@ const ItemTypeAdd = (props) =>{
         <>
         <div>
           
-            <Paper className={`${styles.list_container}`}>
+            <Paper className={`${styles.add_container}`}>
 
                 {/* <Box sx={{ m: 4 }} > </Box> */}
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Box>
-                        <Grid container spacing={2} style={{ minHeight: '250px', paddingLeft: '50px' }}>
+                        <Grid container spacing={2} style={{ minHeight: '200px', }}>
                            
                             <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                                <Card className={`${styles.m_card}`}>
+                                {/* <Card className={`${styles.m_card}`}> */}
                                     <Grid container spacing={1} sx={{ mt: 0 }}>
                                         <Grid item xs={12} className={`${styles.grid_lable}`}>
-                                            <Typography className={`${styles.erp_lable}`}>Item Category</Typography>
+                                            <Typography className={`${styles.erp_lable}`}>Item Type</Typography>
                                         </Grid>
                                         <Grid item xs={12} className={`${styles.grid_input}`}>
                                             <HMinput
@@ -156,8 +156,8 @@ const ItemTypeAdd = (props) =>{
                                                 fullWidth
                                                 type="text"
                                                 onChange={handleChange}
-                                                name="item_category"
-                                                value={(data.item_category)}
+                                                name="item_type"
+                                                value={(data.item_type)}
                                             />
                                         </Grid>
                                         
@@ -170,7 +170,7 @@ const ItemTypeAdd = (props) =>{
                                             </Box>
                                         </Grid>
                                     </Grid>
-                                </Card>
+                                {/* </Card> */}
                             </Grid>
                         </Grid>
                     </Box>

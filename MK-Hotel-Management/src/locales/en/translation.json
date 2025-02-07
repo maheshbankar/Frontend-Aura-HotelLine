@@ -15,5 +15,15 @@
     "masters": "Masters",
     "dashboard": "Dashboard",
     "order": "Order",
-    "back": "Back"
+    "back": "Back",
+    "-----------new added only english titles ----":"test",
+    "item_list":"Item List",
+    "search":"Search",
+    "download_excel":"Download Excel File",
+    "create_new":"Create New",
+    "item_category":"Item Category",
+    "action":"Action",
+    "edit_record":"Edit Record",
+    "delete_record":"Delete Record",
+    "item_type":"Item Type"
 }
